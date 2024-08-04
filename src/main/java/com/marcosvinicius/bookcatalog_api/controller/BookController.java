@@ -1,24 +1,20 @@
 package com.marcosvinicius.bookcatalog_api.controller;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.marcosvinicius.bookcatalog_api.model.Book;
 import com.marcosvinicius.bookcatalog_api.service.BookService;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Map;
+import java.util.HashMap;
+
 @RestController
 @RequestMapping("/books")
+@CrossOrigin(origins = "*") // Permite CORS para todas as origens
 public class BookController {
 
     @Autowired
@@ -40,7 +36,7 @@ public class BookController {
         return bookService.save(book);
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book book) {
         if (!bookService.findById(id).isPresent()) {
             return ResponseEntity.notFound().build();
@@ -50,12 +46,13 @@ public class BookController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteBook(@PathVariable Long id) {
         if (!bookService.findById(id).isPresent()) {
             return ResponseEntity.notFound().build();
         }
         bookService.deleteById(id);
-        return ResponseEntity.noContent().build();
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Book with ID " + id + " has been deleted.");
+        return ResponseEntity.ok(response);
     }
-
 }
